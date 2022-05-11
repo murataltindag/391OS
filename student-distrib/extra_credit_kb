@@ -1,0 +1,161 @@
+
+/* EXTRA CREDIT */
+// int check_success(uint8_t success_cmd){
+//         uint8_t test;
+//         test = inb(KEYBOARD_DATA_PORT); //check if test passed
+//         if(test != success_cmd){
+//             return 1;
+//         }
+//         else{ 
+//             return 0;
+//         }
+// }
+
+// int wait_for_response(int bit, uint8_t status){
+//     if(bit){
+//         status = 0x00; 
+//         while(status & 0x02 == 0){
+//             status = inb(KEYBOARD_STATUS_CMD_PORT);
+//        }
+//     }
+//     else if (!bit){
+//         status = 0x00; 
+//         while(status & 0x01 == 0){
+//             status = inb(KEYBOARD_STATUS_CMD_PORT);
+//        }
+//     }
+//     return 0;
+// }
+
+
+// /* Initialize the Keyboard*/
+// int controller_init(){
+//     cli();
+//     uint8_t ccb;
+//     int not_dual_channel;
+//     uint32_t status;
+//     uint8_t ready;
+//     not_dual_channel = 0;
+
+//     /* Step 3: Disable Devices */
+//     outb(0xAD, KEYBOARD_STATUS_CMD_PORT);  
+//     outb(0xA7, KEYBOARD_STATUS_CMD_PORT);
+
+
+//     /* Step 4: Flush the Output Buffer */
+//     inb(KEYBOARD_DATA_PORT); 
+
+//     /* Step 5: Set the Controller Configuration Byte */
+//     outb(0x20, KEYBOARD_STATUS_CMD_PORT); 
+
+//     wait_for_response(0, status);
+
+//     ccb = inb(KEYBOARD_DATA_PORT);  
+//     ccb = ccb & 0x3C;       
+
+//     if((ccb >> 4) & 1 == 0){ //test ccb bit 5
+//         not_dual_channel = 1;
+//     }
+
+//     outb(0x60, KEYBOARD_STATUS_CMD_PORT);  // write ccb back 0x60
+//     wait_for_response(1, status);
+
+//     outb(ccb, KEYBOARD_DATA_PORT);
+
+//     /* Step 6: Perform Controller Self Test */
+//     outb(0xAA, KEYBOARD_STATUS_CMD_PORT);
+//     wait_for_response(0, status);
+
+//     if (check_for_success(0x55)){
+//         return -1;
+//     }
+
+//     /* Step 7: Determine If There Are 2 Channels */
+//     if(not_dual_channel == 0){  //skip this step if you know it's single channel
+//         outb(0xAE, KEYBOARD_STATUS_CMD_PORT);
+        
+//         wait_for_response(0, status);
+    
+//         ccb = inb(KEYBOARD_DATA_PORT);    
+
+//         if((ccb >> 4) & 1 == 0){ //test ccb bit 5
+//             not_dual_channel = 1;
+//         }
+//         if (not_dual_channel == 1){
+//             outb(0xA7, KEYBOARD_STATUS_CMD_PORT); //disable second port
+//         }
+//     }
+
+
+//     /* Step 8: Perform Interface Tests */
+//     outb(0xAB, KEYBOARD_STATUS_CMD_PORT);   
+    
+//     wait_for_response(0, status);
+
+//     if (check_for_success(0x00)){
+//         return -1;
+//     }
+    
+//     if (not_dual_channel == 0){
+//         outb(0xA9, KEYBOARD_STATUS_CMD_PORT);   
+    
+//         wait_for_response(0, status);
+
+//         if (check_for_success(0x00)){
+//         return -1;
+//     }
+//     }
+
+//     /* Step 9: Enable Devices */
+//     outb(0xAE, KEYBOARD_STATUS_CMD_PORT);
+//     if (not_dual_channel == 0){
+//         wait_for_response(0, status);
+//         outb(0xA8, KEYBOARD_STATUS_CMD_PORT);
+//     }
+
+//     wait_for_response(0, status);
+    
+//     ccb = inb(KEYBOARD_DATA_PORT);
+//     if (not_dual_channel == 0){// set bit 0 and 1 accordingly
+//         ccb = ccb | 0x03;
+//     }
+//     else {
+//         ccb = ccb | 0x01;
+//     }
+
+//     outb(0x60, KEYBOARD_STATUS_CMD_PORT);  // write ccb back 0x60
+   
+//     wait_for_response(1, status);
+
+//     outb(ccb, KEYBOARD_DATA_PORT);
+
+
+
+//     /* Step 10: Reset Devices */
+
+//     while(1){
+//         outb(0x60, KEYBOARD_STATUS_CMD_PORT);
+//         wait_for_response(1, status);
+//         outb(0xFF, KEYBOARD_DATA_PORT);
+//         wait_for_response(0, status);
+//         ready = inb(KEYBOARD_DATA_PORT);
+//         switch (ready)
+//         {
+//         case 0xFA:
+//             return 0;
+//             break;
+//         case 0xFC:
+//             return -1;
+//             break;
+//         case 0xFE:
+//             break;
+//         default:
+//             break;
+//         }
+//     }
+//     sti();
+
+//     return 0;
+// }
+
+
